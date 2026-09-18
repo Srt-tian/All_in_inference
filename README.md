@@ -6,17 +6,17 @@
 
 Model-agnostic · Embodiment-independent · Sync / Async · NumPy only
 
-[快速开始](#快速开始) · [框架与接口](docs/ARCHITECTURE.md) · [接入现有推理与机械臂](docs/INTEGRATION.md) · [验证记录](docs/VALIDATION.md)
+[快速开始](#快速开始) · [框架与接口](docs/ARCHITECTURE.md) · [模型与机械臂接入](docs/INTEGRATION.md) · [验证记录](docs/VALIDATION.md)
 
 </div>
 
-把低频策略输出接到高频机械臂控制，不应要求重写整套推理代码。本仓库将**策略调用、同步/异步调度、跨 chunk 平滑、连续插值、控制时钟、硬件适配**拆成可独立迭代的模块。
+All in Inference 是面向机器人策略部署的模块化推理执行框架，将低频 action chunk 转换为连续的高频控制指令。**策略调用、同步/异步调度、跨 chunk 平滑、连续插值、控制时钟、硬件适配**均可独立扩展。
 
-源自已有 inference 系统及 [RoboRSI](https://github.com/Srt-tian/RoboRSI_v1) 的 Piper 连续执行经验，以全新通用实现整理。**当前版本通过离线与模拟执行验证；新框架尚未完成真机验收。** 默认 CLI 只运行模拟器，不连接 CAN、不使能电机。
+**当前版本通过离线与模拟执行验证，尚未完成真机验收。** 默认 CLI 只运行模拟器，不连接 CAN、不使能电机。
 
 ![All in Inference architecture](docs/assets/architecture.svg)
 
-框架图由 `drawio-skill` 工作流生成：[可编辑 draw.io](docs/assets/architecture.drawio) · [PNG](docs/assets/architecture.png) · [生成脚本](scripts/draw_architecture.py)。
+框架图：[可编辑 draw.io](docs/assets/architecture.drawio) · [PNG](docs/assets/architecture.png) · [生成脚本](scripts/draw_architecture.py)。
 
 ## 解决什么问题
 
@@ -35,7 +35,7 @@ Inference
 共用 Timeline → Interpolation → 200 Hz → RobotAdapter
 ```
 
-使用 `inference.create_runtime(...)` 统一构造，见[模式配置与插件注册](docs/ASYNC_METHODS.md#模式入口与插件注册)。旧的底层 `Runtime` 和导入路径保留兼容。
+使用 `inference.create_runtime(...)` 统一构造，见[模式配置与插件注册](docs/ASYNC_METHODS.md#模式入口与插件注册)。需要定制执行流程时，也可直接组合底层 `Runtime` 与调度器。
 
 | 层 | 职责 | 当前实现 / 扩展方式 |
 | --- | --- | --- |
@@ -46,7 +46,7 @@ Inference
 | Timeline | 时间对齐和有界缓存 | 应用所选方法的融合规则，拒绝过期结果 |
 | Interpolation | 离散 action → 连续目标 | 线性 / 单调三次 Hermite；按轴决定是否混合 |
 | Control | 按时下发、限制命令步长 | 独立 200 Hz 时钟、速度限制、跳过错过的时槽、状态/推理超时 |
-| RobotAdapter | 读反馈、直接写命令、保持 | `SimRobot` / `CallbackRobot`；不绑定 Piper 或固定 14 维 |
+| RobotAdapter | 读反馈、直接写命令、保持 | `SimRobot` / `CallbackRobot`；支持可配置关节布局 |
 | Report | 保存可追踪证据 | 内存有界记录；执行后写 JSON / CSV，不在控制环中同步 Web |
 
 **Temporal smoothing 和 high frequency 是两回事。** 前者解决新旧预测切换，插值层生成连续目标，高频控制器按独立时钟真正下发。把数组插得更密，并不自动获得 200 Hz 控制。
@@ -85,7 +85,7 @@ outputs/dual6/
 
 这两个文件在执行结束后生成。统计窗口有界，超过容量会记录丢弃计数。`measured_hz` 是主机命令调用的实测频率，不能代替 CAN 到达率或电机内部伺服频率。
 
-## 三个频率分别配置
+## 频率配置
 
 ```json
 {
@@ -125,7 +125,7 @@ outputs/dual6/
 
 Legato、RTC 等通过独立的方法层接入，不需要往控制循环添加算法分支。已提供 Legato 客户端协议骨架及请求/解码/整合反馈 hook，见 [异步方法扩展](docs/ASYNC_METHODS.md)；这不代表服务端算法或真机复现已完成。
 
-原 inference 的 `temporal_ensembling` 还包含按预测次序计算指数权重的版本；这里的 `temporal_ensemble` 明确指 EMA，**不宣称数值等价**。详细差异见[来源与迁移](docs/PROVENANCE.md)。
+`temporal_ensemble` 使用同一目标时刻预测的指数滑动平均（EMA），通过 `inference.async.options.new_weight` 设置新预测权重。权重越大，融合结果越偏向新预测。
 
 ## 适配不同机械臂
 
@@ -150,7 +150,7 @@ print(result["measured_hz"])
 
 接真机时替换 `RobotAdapter`，接新模型时替换 `Policy`。`JointCodec` 可统一关节顺序、角度/长度单位、仿射反归一化及 observation-relative action。**末端位姿、IK、碰撞规划和力控不是当前核心的职责**；应在策略解码或机械臂专用模块中完成后，输出绝对关节目标。
 
-已有 inference 的 high-follow worker 与这里的控制器只能有一个拥有写权限，不能把本框架 200 Hz 输出再塞进旧的插值队列。可落地的迁移步骤和 Piper 方法映射见 [INTEGRATION.md](docs/INTEGRATION.md)。
+每个设备只由一个控制线程下发命令。`RobotAdapter.write()` 应直接发送目标，避免叠加额外的插值队列或控制线程。接口约定见[接入指南](docs/INTEGRATION.md)。
 
 ## 代码导航
 
@@ -167,8 +167,8 @@ src/all_in_inference/
 │   │   ├── fusion.py     # 方法选用的渐变 / EMA / 替换组件
 │   │   └── legato.py     # Legato 协议插件；其他方法可注册
 │   └── contracts.py  # 方法生命周期与模型历史契约
-├── scheduling.py     # 旧导入路径兼容
-├── methods.py        # 旧导入路径兼容
+├── scheduling.py     # 调度接口导出
+├── methods.py        # 方法接口导出
 ├── timeline.py       # 过期丢弃、跨 chunk 融合、连续目标采样
 ├── control.py        # 逐轴速度限制
 ├── runtime.py        # 三个执行角色、故障传播、停止与保持
@@ -187,4 +187,4 @@ docs/                 # 设计、接入、验证、路线图与框架图
 
 后续重点是经真机验证的设备插件、RTC / future-conditioned 调度、动态重定时和硬实时后端。见 [ROADMAP.md](docs/ROADMAP.md) 与 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-仓库没有搬运内部 inference 源码、SDK、模型权重或认证配置。软件许可证尚待仓库所有者选择；本仓库不替第三方依赖授予许可。
+软件许可证尚待项目维护者指定；第三方依赖遵循各自许可证。
