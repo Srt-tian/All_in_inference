@@ -3,9 +3,12 @@
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from .methods import Prediction
 
 
 def frozen_array(value) -> np.ndarray:
@@ -90,6 +93,7 @@ class Request:
     start_tick: int
     action_hz: float
     pending: np.ndarray
+    request_tick: float | None = None
 
     def __post_init__(self):
         object.__setattr__(self, "pending", frozen_array(self.pending))
@@ -111,7 +115,7 @@ class ActionChunk:
 
 
 class Policy(Protocol):
-    def predict(self, request: Request) -> np.ndarray:
+    def predict(self, request: Request) -> "np.ndarray | Prediction":
         """Return H x D absolute robot-space positions sampled at request.action_hz.
 
         Honour transport timeouts. Never write to a robot from this method.

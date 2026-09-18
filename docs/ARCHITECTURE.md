@@ -52,6 +52,7 @@ q(i) = (1 - w_new(i))*old(i) + w_new(i)*new(i)
 ## 扩展规则
 
 - 新策略：实现 `predict(Request) -> ndarray[H,D]`；在此完成 payload、网络调用和机器人空间解码。
+- 新异步方法：使用 `MethodPolicy` + `InferenceMethod`，返回 `Prediction`，获得整合结果反馈并保存 model-space 历史；见 [ASYNC_METHODS.md](ASYNC_METHODS.md)。Legato 协议骨架已提供。
 - 新设备：实现 `spec/read/write/hold`；框架不管理 CAN 名称、URDF、使能流程。
 - 新调度：实现 `ready(tick,end_tick,since_request)` 和 `result_start(requested_tick,arrival_tick)`。参考 `examples/custom_schedule.py`。
 - 新平滑：在 Timeline 中新增明确的同 tick 融合规则及延迟/重置测试。

@@ -23,6 +23,7 @@ Model-agnostic · Embodiment-independent · Sync / Async · NumPy only
 | 层 | 职责 | 当前实现 / 扩展方式 |
 | --- | --- | --- |
 | Policy | 调用模型并解码动作 | `Policy`、`CallablePolicy`、`JointCodec`；接任意 SDK / HTTP / WebSocket 客户端 |
+| Method | 异步算法协议与历史 | `InferenceMethod`、`MethodPolicy`；独立 model-space 缓存、生命周期 hook、Legato 协议骨架 |
 | Schedule | 何时请求、结果放在什么时间 | `AsyncSchedule` / `SyncSchedule`；实现两个方法即可新增调度 |
 | Timeline | 新旧预测对齐与合并 | `replace`、`temporal` 渐变、`ensemble` 指数滑动融合 |
 | Interpolation | 离散 action → 连续目标 | 线性 / 单调三次 Hermite；按轴决定是否混合 |
@@ -100,6 +101,8 @@ outputs/dual6/
 
 两种调度都保留独立控制循环。同步模式等待推理时保持最后下发位置，**不表示阻塞 200 Hz 写线程**。时间轴消费完毕也不等于物体抓取完成；任务成功应由上层反馈判断。
 
+Legato、RTC 等通过独立的方法层接入，不需要往控制循环添加算法分支。已提供 Legato 客户端协议骨架及请求/解码/整合反馈 hook，见 [异步方法扩展](docs/ASYNC_METHODS.md)；这不代表服务端算法或真机复现已完成。
+
 原 inference 的 `temporal_ensembling` 还包含按预测次序计算指数权重的版本；这里的 `ensemble` 明确指 EMA，**不宣称数值等价**。详细差异见[来源与迁移](docs/PROVENANCE.md)。
 
 ## 适配不同机械臂
@@ -133,6 +136,7 @@ src/all_in_inference/
 ├── codecs.py         # 模型坐标、单位及 joint order 转换
 ├── adapters.py       # 模拟器、回调硬件接口、策略客户端桥接
 ├── scheduling.py     # 同步 / 异步策略，后续调度扩展点
+├── methods.py        # 异步方法生命周期、模型历史、Legato 协议接线
 ├── timeline.py       # 过期丢弃、跨 chunk 融合、连续目标采样
 ├── control.py        # 逐轴速度限制
 ├── runtime.py        # 三个执行角色、故障传播、停止与保持

@@ -9,6 +9,7 @@ from dataclasses import asdict, dataclass
 import numpy as np
 
 from .control import SlewLimiter
+from .methods import IntegrationFeedback, Prediction
 from .scheduling import AsyncSchedule, Schedule
 from .timeline import Timeline
 from .types import ActionChunk, Observation, Policy, Request, RobotAdapter
@@ -133,9 +134,11 @@ class Runtime:
                     start_tick,
                     self.config.action_hz,
                     self.timeline.pending(tick),
+                    request_tick=tick,
                 )
                 last_request = now
-                positions = self.policy.predict(req)
+                output = self.policy.predict(req)
+                prediction = output if isinstance(output, Prediction) else Prediction(output)
                 arrived = time.monotonic()
                 if self._stop.is_set():
                     return  # late network response can never resurrect motion
@@ -144,8 +147,23 @@ class Runtime:
                 arrival_tick = (arrived - epoch) * self.config.action_hz
                 output_start = self.schedule.result_start(start_tick, math.floor(arrival_tick) + 1)
                 result = self.timeline.integrate(
-                    ActionChunk(positions, output_start, request_id, req.generation), arrival_tick
+                    ActionChunk(prediction.positions, output_start, request_id, req.generation),
+                    arrival_tick,
                 )
+                hook = getattr(self.policy, "on_integrated", None)
+                if hook is not None and not self._stop.is_set():
+                    hook(
+                        req,
+                        prediction,
+                        IntegrationFeedback(
+                            output_start,
+                            arrival_tick,
+                            arrived - now,
+                            result.accepted,
+                            result.dropped,
+                            result.reason,
+                        ),
+                    )
                 event = {
                     "request_id": request_id,
                     "latency_s": arrived - now,
