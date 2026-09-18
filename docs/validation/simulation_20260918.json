@@ -1,0 +1,632 @@
+{
+  "date": "2026-09-18",
+  "hardware": false,
+  "python": "3.10.12",
+  "numpy": "2.2.6",
+  "runs": [
+    {
+      "example": "single6_async",
+      "duration_s": 3,
+      "summary": {
+        "config": {
+          "action_hz": 25,
+          "control_hz": 200,
+          "observation_hz": 50,
+          "smoothing": "temporal",
+          "interpolation": "cubic",
+          "ensemble_new_weight": 0.6,
+          "lead_steps": 1,
+          "buffer_capacity": 512,
+          "state_timeout": 0.25,
+          "policy_timeout": 3.0,
+          "underrun_timeout": 4.0,
+          "worker_join_timeout": 1.0,
+          "trace_capacity": 120000
+        },
+        "robot": "single6_async-SIM-ONLY",
+        "schedule": "AsyncSchedule",
+        "commands": 601,
+        "retained_samples": 601,
+        "dropped_trace_samples": 0,
+        "dropped_events": 0,
+        "skipped_control_slots": 0,
+        "velocity_limited_steps": 29,
+        "measured_hz": 200.01459879796528,
+        "interval_p99_ms": 5.446740270708688,
+        "interval_max_ms": 5.7941770064644516,
+        "underrun_samples": 5,
+        "faults": [],
+        "inference_events": [
+          {
+            "request_id": 0,
+            "latency_s": 0.020224520994815975,
+            "requested_tick": 1,
+            "output_start_tick": 1,
+            "arrival_tick": 0.5138847249327227,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 1,
+            "latency_s": 0.020287407969590276,
+            "requested_tick": 6,
+            "output_start_tick": 6,
+            "arrival_tick": 5.539071874227375,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 2,
+            "latency_s": 0.020567963016219437,
+            "requested_tick": 11,
+            "output_start_tick": 11,
+            "arrival_tick": 10.57172150030965,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 3,
+            "latency_s": 0.020325259014498442,
+            "requested_tick": 16,
+            "output_start_tick": 16,
+            "arrival_tick": 15.601941575005185,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 4,
+            "latency_s": 0.020266028004698455,
+            "requested_tick": 21,
+            "output_start_tick": 21,
+            "arrival_tick": 20.62966097437311,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 5,
+            "latency_s": 0.02040651097195223,
+            "requested_tick": 26,
+            "output_start_tick": 26,
+            "arrival_tick": 25.636808449053206,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 6,
+            "latency_s": 0.02036879997467622,
+            "requested_tick": 31,
+            "output_start_tick": 31,
+            "arrival_tick": 30.641928873956203,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 7,
+            "latency_s": 0.020256149990018457,
+            "requested_tick": 36,
+            "output_start_tick": 36,
+            "arrival_tick": 35.67520117503591,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 8,
+            "latency_s": 0.020261870988178998,
+            "requested_tick": 41,
+            "output_start_tick": 41,
+            "arrival_tick": 40.697367474786006,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 9,
+            "latency_s": 0.020262832986190915,
+            "requested_tick": 46,
+            "output_start_tick": 46,
+            "arrival_tick": 45.6987932746415,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 10,
+            "latency_s": 0.02021816896740347,
+            "requested_tick": 51,
+            "output_start_tick": 51,
+            "arrival_tick": 50.710978149436414,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 11,
+            "latency_s": 0.02028265001717955,
+            "requested_tick": 56,
+            "output_start_tick": 56,
+            "arrival_tick": 55.77156524959719,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 12,
+            "latency_s": 0.020538798009511083,
+            "requested_tick": 61,
+            "output_start_tick": 61,
+            "arrival_tick": 60.81687029945897,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 13,
+            "latency_s": 0.020547444000840187,
+            "requested_tick": 66,
+            "output_start_tick": 66,
+            "arrival_tick": 65.86682777415263,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 14,
+            "latency_s": 0.02062990900594741,
+            "requested_tick": 71,
+            "output_start_tick": 71,
+            "arrival_tick": 70.89174547436414,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          }
+        ]
+      }
+    },
+    {
+      "example": "dual6_async",
+      "duration_s": 3,
+      "summary": {
+        "config": {
+          "action_hz": 25,
+          "control_hz": 200,
+          "observation_hz": 50,
+          "smoothing": "temporal",
+          "interpolation": "cubic",
+          "ensemble_new_weight": 0.6,
+          "lead_steps": 1,
+          "buffer_capacity": 512,
+          "state_timeout": 0.25,
+          "policy_timeout": 3.0,
+          "underrun_timeout": 4.0,
+          "worker_join_timeout": 1.0,
+          "trace_capacity": 120000
+        },
+        "robot": "dual6_async-SIM-ONLY",
+        "schedule": "AsyncSchedule",
+        "commands": 601,
+        "retained_samples": 601,
+        "dropped_trace_samples": 0,
+        "dropped_events": 0,
+        "skipped_control_slots": 0,
+        "velocity_limited_steps": 49,
+        "measured_hz": 200.0370614676149,
+        "interval_p99_ms": 5.314864305546507,
+        "interval_max_ms": 5.786713969428092,
+        "underrun_samples": 5,
+        "faults": [],
+        "inference_events": [
+          {
+            "request_id": 0,
+            "latency_s": 0.020325871009845287,
+            "requested_tick": 1,
+            "output_start_tick": 1,
+            "arrival_tick": 0.5176081991521642,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 1,
+            "latency_s": 0.020474667951930314,
+            "requested_tick": 6,
+            "output_start_tick": 6,
+            "arrival_tick": 5.530298298981506,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 2,
+            "latency_s": 0.020452947996091098,
+            "requested_tick": 11,
+            "output_start_tick": 11,
+            "arrival_tick": 10.53102379955817,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 3,
+            "latency_s": 0.020305391983129084,
+            "requested_tick": 16,
+            "output_start_tick": 16,
+            "arrival_tick": 15.552367323834915,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 4,
+            "latency_s": 0.020314107998274267,
+            "requested_tick": 21,
+            "output_start_tick": 21,
+            "arrival_tick": 20.600308050052263,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 5,
+            "latency_s": 0.02030135499080643,
+            "requested_tick": 26,
+            "output_start_tick": 26,
+            "arrival_tick": 25.602836949110497,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 6,
+            "latency_s": 0.020390902005601674,
+            "requested_tick": 31,
+            "output_start_tick": 31,
+            "arrival_tick": 30.621443124255165,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 7,
+            "latency_s": 0.020584142999723554,
+            "requested_tick": 36,
+            "output_start_tick": 36,
+            "arrival_tick": 35.64349924999988,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 8,
+            "latency_s": 0.02050268097082153,
+            "requested_tick": 41,
+            "output_start_tick": 41,
+            "arrival_tick": 40.65213879948715,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 9,
+            "latency_s": 0.02029457304161042,
+            "requested_tick": 46,
+            "output_start_tick": 46,
+            "arrival_tick": 45.662112125137355,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 10,
+            "latency_s": 0.020426477945875376,
+            "requested_tick": 51,
+            "output_start_tick": 51,
+            "arrival_tick": 50.71057332388591,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 11,
+            "latency_s": 0.020633936976082623,
+            "requested_tick": 56,
+            "output_start_tick": 56,
+            "arrival_tick": 55.76171007414814,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 12,
+            "latency_s": 0.020485989982262254,
+            "requested_tick": 61,
+            "output_start_tick": 61,
+            "arrival_tick": 60.77878289943328,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 13,
+            "latency_s": 0.02034276199992746,
+            "requested_tick": 66,
+            "output_start_tick": 66,
+            "arrival_tick": 65.77659174945438,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 14,
+            "latency_s": 0.020506007014773786,
+            "requested_tick": 71,
+            "output_start_tick": 71,
+            "arrival_tick": 70.79433934995905,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          }
+        ]
+      }
+    },
+    {
+      "example": "single7_sync",
+      "duration_s": 3,
+      "summary": {
+        "config": {
+          "action_hz": 25,
+          "control_hz": 200,
+          "observation_hz": 50,
+          "smoothing": "temporal",
+          "interpolation": "cubic",
+          "ensemble_new_weight": 0.6,
+          "lead_steps": 1,
+          "buffer_capacity": 512,
+          "state_timeout": 0.25,
+          "policy_timeout": 3.0,
+          "underrun_timeout": 4.0,
+          "worker_join_timeout": 1.0,
+          "trace_capacity": 120000
+        },
+        "robot": "single7_sync-SIM-ONLY",
+        "schedule": "SyncSchedule",
+        "commands": 601,
+        "retained_samples": 601,
+        "dropped_trace_samples": 0,
+        "dropped_events": 0,
+        "skipped_control_slots": 0,
+        "velocity_limited_steps": 35,
+        "measured_hz": 200.05143689205627,
+        "interval_p99_ms": 5.305262307520024,
+        "interval_max_ms": 5.526988010387868,
+        "underrun_samples": 15,
+        "faults": [],
+        "inference_events": [
+          {
+            "request_id": 0,
+            "latency_s": 0.02030947001185268,
+            "requested_tick": 1,
+            "output_start_tick": 1,
+            "arrival_tick": 0.5315948510542512,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 1,
+            "latency_s": 0.020373179984744638,
+            "requested_tick": 33,
+            "output_start_tick": 33,
+            "arrival_tick": 32.53925930039259,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 2,
+            "latency_s": 0.020263193000573665,
+            "requested_tick": 65,
+            "output_start_tick": 65,
+            "arrival_tick": 64.52836767566623,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          }
+        ]
+      }
+    },
+    {
+      "example": "mixed_async",
+      "duration_s": 3,
+      "summary": {
+        "config": {
+          "action_hz": 25,
+          "control_hz": 200,
+          "observation_hz": 50,
+          "smoothing": "temporal",
+          "interpolation": "cubic",
+          "ensemble_new_weight": 0.6,
+          "lead_steps": 1,
+          "buffer_capacity": 512,
+          "state_timeout": 0.25,
+          "policy_timeout": 3.0,
+          "underrun_timeout": 4.0,
+          "worker_join_timeout": 1.0,
+          "trace_capacity": 120000
+        },
+        "robot": "mixed_async-SIM-ONLY",
+        "schedule": "AsyncSchedule",
+        "commands": 601,
+        "retained_samples": 601,
+        "dropped_trace_samples": 0,
+        "dropped_events": 0,
+        "skipped_control_slots": 0,
+        "velocity_limited_steps": 24,
+        "measured_hz": 200.01005697341498,
+        "interval_p99_ms": 5.3122117795282975,
+        "interval_max_ms": 7.497168960981071,
+        "underrun_samples": 5,
+        "faults": [],
+        "inference_events": [
+          {
+            "request_id": 0,
+            "latency_s": 0.020361016038805246,
+            "requested_tick": 1,
+            "output_start_tick": 1,
+            "arrival_tick": 0.518460274906829,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 1,
+            "latency_s": 0.020318387018051,
+            "requested_tick": 6,
+            "output_start_tick": 6,
+            "arrival_tick": 5.539978724846151,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 2,
+            "latency_s": 0.020283663005102426,
+            "requested_tick": 11,
+            "output_start_tick": 11,
+            "arrival_tick": 10.581145649484824,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 3,
+            "latency_s": 0.020259886980056763,
+            "requested_tick": 16,
+            "output_start_tick": 16,
+            "arrival_tick": 15.625019848812371,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 4,
+            "latency_s": 0.02034798200475052,
+            "requested_tick": 21,
+            "output_start_tick": 21,
+            "arrival_tick": 20.656507699459326,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 5,
+            "latency_s": 0.020398626977112144,
+            "requested_tick": 26,
+            "output_start_tick": 26,
+            "arrival_tick": 25.681205124419648,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 6,
+            "latency_s": 0.020341680967248976,
+            "requested_tick": 31,
+            "output_start_tick": 31,
+            "arrival_tick": 30.711415073892567,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 7,
+            "latency_s": 0.020243998034857213,
+            "requested_tick": 36,
+            "output_start_tick": 36,
+            "arrival_tick": 35.751072425046004,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 8,
+            "latency_s": 0.02044691698392853,
+            "requested_tick": 41,
+            "output_start_tick": 41,
+            "arrival_tick": 40.79347739898367,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 9,
+            "latency_s": 0.02044536400353536,
+            "requested_tick": 46,
+            "output_start_tick": 46,
+            "arrival_tick": 45.806447899667546,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 10,
+            "latency_s": 0.020265377999749035,
+            "requested_tick": 51,
+            "output_start_tick": 51,
+            "arrival_tick": 50.83896894939244,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 11,
+            "latency_s": 0.020497020974289626,
+            "requested_tick": 56,
+            "output_start_tick": 56,
+            "arrival_tick": 55.8859239492449,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 12,
+            "latency_s": 0.020301085023675114,
+            "requested_tick": 61,
+            "output_start_tick": 61,
+            "arrival_tick": 60.93078654957935,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 13,
+            "latency_s": 0.020311113039497286,
+            "requested_tick": 66,
+            "output_start_tick": 66,
+            "arrival_tick": 65.9505998250097,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          },
+          {
+            "request_id": 14,
+            "latency_s": 0.02027935499791056,
+            "requested_tick": 71,
+            "output_start_tick": 71,
+            "arrival_tick": 70.97722462494858,
+            "accepted": 32,
+            "dropped": 0,
+            "reason": "accepted"
+          }
+        ]
+      }
+    }
+  ]
+}

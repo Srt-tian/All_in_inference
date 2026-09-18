@@ -1,0 +1,21 @@
+# Template: move to .github/workflows/tests.yml with a workflow-authorized credential.
+name: Offline tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m ruff check src tests scripts examples
+      - run: python -m ruff format --check src tests scripts examples
+      - run: python -m unittest discover -s tests -v
+      - run: all-in-inference --config examples/dual6_async.json --duration 1 --output outputs/ci

@@ -1,0 +1,164 @@
+{
+  "robot": {
+    "name": "dual6_async-SIM-ONLY",
+    "joints": [
+      {
+        "name": "left_j1",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "left"
+      },
+      {
+        "name": "left_j2",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "left"
+      },
+      {
+        "name": "left_j3",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "left"
+      },
+      {
+        "name": "left_j4",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "left"
+      },
+      {
+        "name": "left_j5",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "left"
+      },
+      {
+        "name": "left_j6",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "left"
+      },
+      {
+        "name": "left_gripper",
+        "lower": 0,
+        "upper": 0.08,
+        "max_velocity": 0.1,
+        "kind": "prismatic",
+        "blend": false,
+        "group": "left"
+      },
+      {
+        "name": "right_j1",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "right"
+      },
+      {
+        "name": "right_j2",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "right"
+      },
+      {
+        "name": "right_j3",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "right"
+      },
+      {
+        "name": "right_j4",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "right"
+      },
+      {
+        "name": "right_j5",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "right"
+      },
+      {
+        "name": "right_j6",
+        "lower": -2.5,
+        "upper": 2.5,
+        "max_velocity": 0.6,
+        "kind": "revolute",
+        "blend": true,
+        "group": "right"
+      },
+      {
+        "name": "right_gripper",
+        "lower": 0,
+        "upper": 0.08,
+        "max_velocity": 0.1,
+        "kind": "prismatic",
+        "blend": false,
+        "group": "right"
+      }
+    ]
+  },
+  "initial": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0.04,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0.04
+  ],
+  "runtime": {
+    "action_hz": 25,
+    "control_hz": 200,
+    "observation_hz": 50,
+    "smoothing": "temporal",
+    "interpolation": "cubic"
+  },
+  "schedule": {
+    "kind": "async",
+    "inference_hz": 5
+  },
+  "demo_policy": {
+    "horizon": 32,
+    "latency": 0.02
+  }
+}
