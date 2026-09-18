@@ -24,9 +24,7 @@ class RuntimeConfig:
     action_hz: float = 25.0
     control_hz: float = 200.0
     observation_hz: float = 50.0
-    smoothing: str = "temporal"
     interpolation: str = "cubic"
-    ensemble_new_weight: float = 0.6
     lead_steps: int = 1
     buffer_capacity: int = 512
     state_timeout: float = 0.25
@@ -59,17 +57,19 @@ class RuntimeConfig:
 
 class Runtime:
     def __init__(
-        self, robot: RobotAdapter, policy: Policy, config=None, schedule: Schedule | None = None
+        self,
+        robot: RobotAdapter,
+        policy: Policy,
+        config=None,
+        schedule: Schedule | None = None,
+        *,
+        fusion=None,
     ):
         self.robot, self.policy = robot, policy
         self.config = config or RuntimeConfig()
         self.schedule = schedule or AsyncSchedule()
-        self.timeline = Timeline(
-            robot.spec,
-            self.config.smoothing,
-            self.config.buffer_capacity,
-            self.config.ensemble_new_weight,
-        )
+        self.timeline = Timeline(robot.spec, capacity=self.config.buffer_capacity, fusion=fusion)
+        self.inference_label = {"mode": "custom", "method": None}
         self._stop = threading.Event()
         self._lock = threading.Lock()
         self._observation: Observation | None = None
@@ -291,6 +291,8 @@ class Runtime:
             "config": asdict(self.config),
             "robot": self.robot.spec.name,
             "schedule": type(self.schedule).__name__,
+            "inference": dict(self.inference_label),
+            "chunk_fusion": asdict(self.timeline.fusion),
             "commands": self._commands,
             "retained_samples": len(times),
             "dropped_trace_samples": self._dropped_trace,

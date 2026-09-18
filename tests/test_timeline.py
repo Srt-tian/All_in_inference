@@ -15,7 +15,7 @@ def spec():
 
 class TimelineTests(unittest.TestCase):
     def setUp(self):
-        self.buffer = Timeline(spec())
+        self.buffer = Timeline(spec(), "temporal")
         self.buffer.reset([0, 0])
 
     def chunk(self, values, start=1, rid=0, generation=None):

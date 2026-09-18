@@ -20,17 +20,19 @@ Model-agnostic · Embodiment-independent · Sync / Async · NumPy only
 
 ## 解决什么问题
 
-公开入口按下面的层级组织；同步/异步共用底层平滑与高频控制：
+公开入口按下面的层级组织；同步/异步共用连续插值与高频控制，跨 chunk 融合由异步方法选择：
 
 ```text
 Inference
 ├── Sync
 └── Async
-    ├── Basic
+    ├── Naive
+    ├── Temporal Smoothing
+    ├── Temporal Ensemble
     ├── Legato（客户端协议骨架）
     └── 注册插件：RTC / 其他方法（需实现）
          ↓
-共用 Timeline → Smoothing / Interpolation → 200 Hz → RobotAdapter
+共用 Timeline → Interpolation → 200 Hz → RobotAdapter
 ```
 
 使用 `inference.create_runtime(...)` 统一构造，见[模式配置与插件注册](docs/ASYNC_METHODS.md#模式入口与插件注册)。旧的底层 `Runtime` 和导入路径保留兼容。
@@ -40,7 +42,8 @@ Inference
 | Policy | 调用模型并解码动作 | `Policy`、`CallablePolicy`、`JointCodec`；接任意 SDK / HTTP / WebSocket 客户端 |
 | Method | 异步算法协议与历史 | `InferenceMethod`、`MethodPolicy`；独立 model-space 缓存、生命周期 hook、Legato 协议骨架 |
 | Schedule | 何时请求、结果放在什么时间 | `AsyncSchedule` / `SyncSchedule`；实现两个方法即可新增调度 |
-| Timeline | 新旧预测对齐与合并 | `replace`、`temporal` 渐变、`ensemble` 指数滑动融合 |
+| Async method | 新旧 chunk 的整合规则 | Naive / Temporal Smoothing / Temporal Ensemble / Legato / 插件 |
+| Timeline | 时间对齐和有界缓存 | 应用所选方法的融合规则，拒绝过期结果 |
 | Interpolation | 离散 action → 连续目标 | 线性 / 单调三次 Hermite；按轴决定是否混合 |
 | Control | 按时下发、限制命令步长 | 独立 200 Hz 时钟、速度限制、跳过错过的时槽、状态/推理超时 |
 | RobotAdapter | 读反馈、直接写命令、保持 | `SimRobot` / `CallbackRobot`；不绑定 Piper 或固定 14 维 |
@@ -70,7 +73,7 @@ python -m unittest discover -s tests -v
 
 未安装包时也可 `PYTHONPATH=src python -m all_in_inference.cli ...`。示例关节范围仅供模拟，**不能直接作为具体机械臂的安全配置**。
 
-若系统 Python 缺少 `ensurepip/venv`，也可使用 `uv venv --python 3.10` 与 `uv pip install -e '.[dev]'`。独立安装、27 项测试及四种构型的模拟测量见[验证记录](docs/VALIDATION.md)。
+若系统 Python 缺少 `ensurepip/venv`，也可使用 `uv venv --python 3.10` 与 `uv pip install -e '.[dev]'`。独立安装、44 项测试及四种构型的模拟测量见[验证记录](docs/VALIDATION.md)。
 
 每次运行生成：
 
@@ -90,12 +93,11 @@ outputs/dual6/
     "action_hz": 25,
     "control_hz": 200,
     "observation_hz": 50,
-    "smoothing": "temporal",
     "interpolation": "cubic"
   },
   "inference": {
     "mode": "async",
-    "async": {"method": "basic", "inference_hz": 5}
+    "async": {"method": "temporal_smoothing", "inference_hz": 5}
   }
 }
 ```
@@ -113,15 +115,17 @@ outputs/dual6/
 | --- | --- | --- |
 | `SyncSchedule` | 消耗当前 chunk 后请求；结果从到达后的下一个 action tick 开始 | 基础策略接入、静态等待式推理 |
 | `AsyncSchedule` | 执行时持续请求；结果保留请求时刻的 tick 对齐，删除已过期前缀 | 有未来 action horizon 的连续推理 |
-| `replace` | 新 chunk 接管对应未来区间 | 已由模型完成连续性处理、对照实验 |
-| `temporal` | 同一目标 tick 上，新预测权重从 0 逐步增至 1 | 缓和新旧 chunk 切换，默认选择 |
-| `ensemble` | 同一目标 tick 上做 EMA，默认新预测权重 0.6 | 希望多次预测融合，允许引入滞后 |
+| `naive` | 新 chunk 接管对应未来区间 | 已由模型完成连续性处理、对照实验 |
+| `temporal_smoothing` | 同一目标 tick 上，新预测权重从 0 逐步增至 1 | 缓和新旧 chunk 切换，默认选择 |
+| `temporal_ensemble` | 同一目标 tick 上做 EMA，默认新预测权重 0.6 | 希望多次预测融合，允许引入滞后 |
+
+默认异步方法为 `temporal_smoothing`；同步、Naive、Legato 和未指定融合的自定义插件使用替换，不会隐式叠加渐变。
 
 两种调度都保留独立控制循环。同步模式等待推理时保持最后下发位置，**不表示阻塞 200 Hz 写线程**。时间轴消费完毕也不等于物体抓取完成；任务成功应由上层反馈判断。
 
 Legato、RTC 等通过独立的方法层接入，不需要往控制循环添加算法分支。已提供 Legato 客户端协议骨架及请求/解码/整合反馈 hook，见 [异步方法扩展](docs/ASYNC_METHODS.md)；这不代表服务端算法或真机复现已完成。
 
-原 inference 的 `temporal_ensembling` 还包含按预测次序计算指数权重的版本；这里的 `ensemble` 明确指 EMA，**不宣称数值等价**。详细差异见[来源与迁移](docs/PROVENANCE.md)。
+原 inference 的 `temporal_ensembling` 还包含按预测次序计算指数权重的版本；这里的 `temporal_ensemble` 明确指 EMA，**不宣称数值等价**。详细差异见[来源与迁移](docs/PROVENANCE.md)。
 
 ## 适配不同机械臂
 
@@ -139,7 +143,7 @@ spec = RobotSpec("my-7dof", tuple(
 robot = SimRobot(spec, initial=[0] * 7)
 policy = SinePolicy(spec, initial=[0] * 7)
 runtime = create_runtime(robot, policy=policy, config=RuntimeConfig(control_hz=200),
-                         inference={"mode": "async", "async": {"method": "basic"}})
+                         inference={"mode": "async", "async": {"method": "temporal_smoothing"}})
 result = runtime.run(duration=5)
 print(result["measured_hz"])
 ```
@@ -160,6 +164,7 @@ src/all_in_inference/
 │   ├── sync.py        # 同步模式
 │   ├── async_methods/
 │   │   ├── scheduling.py # 异步请求调度
+│   │   ├── fusion.py     # 方法选用的渐变 / EMA / 替换组件
 │   │   └── legato.py     # Legato 协议插件；其他方法可注册
 │   └── contracts.py  # 方法生命周期与模型历史契约
 ├── scheduling.py     # 旧导入路径兼容

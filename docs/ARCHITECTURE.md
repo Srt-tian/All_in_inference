@@ -18,16 +18,16 @@ runtime 启动时记单调时钟 `epoch`。时间轴坐标为 `tick=(monotonic-e
 
 `request_id` 单调递增；较旧结果拒绝。`generation` 在 reset 时递增，旧 episode 的迟到结果拒绝。Runtime 实例单次使用，异常后新建实例，不在运动中重新初始化硬件。
 
-## Temporal smoothing
+## 异步方法选用的跨 chunk 融合
 
-时间轴只对**相同目标 tick** 的动作融合。`temporal` 在 `N` 个重叠 tick 上采用：
+异步方法决定是否融合，算法组件位于 `inference/async_methods/fusion.py`，时间轴应用组件但不替用户选择方法。同步、Naive、Legato 默认只替换。融合只针对**相同目标 tick**。`temporal` 在 `N` 个重叠 tick 上采用：
 
 ```text
 w_new(i) = i / (N - 1)             N > 1
 q(i) = (1 - w_new(i))*old(i) + w_new(i)*new(i)
 ```
 
-单点重叠时权重为 0，遵循原 stream buffer 的约定；可选择 `replace` 或 `ensemble` 改变这一行为。`ensemble` 采用配置值 `ensemble_new_weight` 的 EMA，权重越大越偏向新预测。
+单点重叠时权重为 0，遵循原 stream buffer 的约定；可选择 `replace` 或 `ensemble` 改变这一行为。`ensemble` 采用配置值 `inference.async.options.new_weight` 的 EMA，权重越大越偏向新预测。
 
 `blend=false` 的轴直接采纳该目标 tick 的新值，不做新旧混合，采样时零阶保持。适合夹爪事件；若夹爪是连续位置控制，kind 设为 `prismatic`，仍经过速度限制。真正离散的模式/开关轴 kind=`discrete`，不做速度限制，设备端负责合法值校验。
 

@@ -8,9 +8,9 @@ from all_in_inference.inference import create_runtime, register_async_method
 # 同步：没有异步方法选项
 runtime = create_runtime(robot, policy=policy, inference={"mode": "sync"})
 
-# 基础异步：普通 Policy
+# 异步渐变：普通 Policy
 runtime = create_runtime(robot, policy=policy, inference={
-    "mode": "async", "async": {"method": "basic", "inference_hz": 5},
+    "mode": "async", "async": {"method": "temporal_smoothing", "inference_hz": 5},
 })
 
 # Legato：方法插件负责请求构造和解码，transport 负责通信
@@ -25,11 +25,11 @@ runtime = create_runtime(robot, transport=client.infer, inference={
 register_async_method("my_rtc", MyRTCMethod)
 ```
 
-CLI 的示例配置统一改用 `inference.mode` 和 `inference.async`，旧的顶层 `schedule` 配置需迁移。同步模式带 async 配置会报错，未知异步方法也会报错，绝不静默回退。CLI 仍只运行模拟 Basic/Sync；带服务器的方法由 Python API 显式注入 transport。
+CLI 的示例配置统一改用 `inference.mode` 和 `inference.async`，旧的顶层 `schedule` 配置需迁移。同步模式带 async 配置会报错，未知异步方法也会报错，绝不静默回退。CLI 支持模拟 Sync / Naive / Temporal Smoothing / Temporal Ensemble；带服务器的方法由 Python API 显式注入 transport。
 
 方法插件可在 options 中接收自定义编解码回调（Python API）；配置文件不能自动导入或执行任意插件代码。需要自定义底层调度器时，仍可显式组合 `Runtime`，但推荐业务入口使用上述模式层级。
 
-公开入口先选择同步 / 异步模式，再在异步模式下选择 Basic、Legato 或注册的方法。内部调度器负责请求时机，方法插件负责协议与历史，均不拥有机器人写权限。
+公开入口先选择同步 / 异步模式，再在异步模式下选择 Naive、Temporal Smoothing、Temporal Ensemble、Legato 或注册的方法。内部调度器负责请求时机，方法插件负责协议与历史，均不拥有机器人写权限。
 
 ```text
 Schedule.ready
@@ -81,10 +81,38 @@ runtime = Runtime(robot, policy, schedule=AsyncSchedule(inference_hz=5))
 - `ramp_down`：客户端协议参数，原样传递；本地 smoothing 不实现服务端 ramp 算法。
 - `expected_model_shape` 配置后严格验证，缺失或不符会报错；未配置时允许服务端不返回 actions_model。
 
-Legato/RTC 可能已在模型侧处理连续性，接入时先对照 `smoothing="replace"`，避免与本地 temporal 再次融合产生额外滞后。应基于服务端语义和实验选择，框架不自动切换。
+Legato 和自定义协议插件默认使用替换，不叠加 temporal 融合。若算法确实需要融合，插件注册时可显式传 `fusion=ChunkFusion("temporal")`；这种组合是插件作者的算法选择，而不是公共控制层的默认行为。
 
 ## 其他方法
 
 RTC 的模型前缀 masking、future-conditioned 的未来状态、TT-RTC 的原子前缀提交，可各自实现 InferenceMethod，再搭配 Schedule。当前只有一个在途请求；多在途乱序合并、服务端取消和带前缀承诺的原子事务**仍需专门实现与测试**。接口预留不代表这些算法已经实现。
 
 停止后的迟到结果不会触发新整合；插件不得启动脱离 runtime 生命周期的硬件写线程，也不能修改控制时钟。
+
+## 异步方法与融合配置
+
+| method | 输入 | 跨 chunk 整合 |
+| --- | --- | --- |
+| `naive` | Policy | 对齐并丢弃过期前缀后直接替换 |
+| `temporal_smoothing` | Policy | 重叠区间新权重 0→1 |
+| `temporal_ensemble` | Policy | 同 tick EMA，`options.new_weight` 默认 0.6 |
+| `legato` | transport | 服务端协议与模型历史；本地默认替换 |
+| 注册插件 | transport | 默认替换；注册时可显式声明融合组件 |
+
+```json
+{
+  "inference": {
+    "mode": "async",
+    "async": {
+      "method": "temporal_ensemble",
+      "inference_hz": 5,
+      "options": {"new_weight": 0.6}
+    }
+  },
+  "runtime": {"action_hz": 25, "control_hz": 200, "interpolation": "cubic"}
+}
+```
+
+迁移：删除 `runtime.smoothing` 与 `runtime.ensemble_new_weight`，改为选择对应异步方法及 options。旧 `basic` 只作为带告警的 `naive` 别名；若要保留此前默认渐变行为，请明确选择 `temporal_smoothing`。同步模式不提供融合选项。直接构造低层 Runtime / Timeline 默认替换；高级组合可传 `fusion=ChunkFusion(...)`。这次改变默认值是有意消除隐式叠加，不承诺与旧默认配置数值等价。
+
+`summary.json` 新增 `inference` 与 `chunk_fusion`，记录实际选择的方法和融合规则，便于实验对照。

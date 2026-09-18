@@ -1,82 +1,93 @@
 <?xml version='1.0' encoding='utf-8'?>
 <mxfile host="app.diagrams.net">
   <diagram id="all-in-inference" name="Runtime architecture">
-    <mxGraphModel page="1" pageWidth="1340" pageHeight="840" background="#ffffff">
+    <mxGraphModel page="1" pageWidth="1340" pageHeight="1040" background="#ffffff">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="title" value="All in Inference  /  action chunks → continuous execution" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;fontSize=28;fontStyle=1;align=left;">
+        <mxCell id="title" value="All in Inference / sync &amp; async methods" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;fontSize=28;fontStyle=1;align=left;">
           <mxGeometry as="geometry" x="40" y="20" width="1250" height="55" />
         </mxCell>
-        <mxCell id="subtitle" value="Model-agnostic · configurable joint layouts · one command writer · post-run reporting" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;align=left;fontSize=16;">
-          <mxGeometry as="geometry" x="40" y="76" width="1240" height="34" />
+        <mxCell id="mode" value="&lt;b&gt;Inference entry&lt;/b&gt;&lt;br&gt;Choose sync or async" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf3fb;strokeColor=#648bab;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="470" y="110" width="300" height="90" />
         </mxCell>
-        <mxCell id="observation" value="&lt;b&gt;Observation worker&lt;/b&gt;&lt;br&gt;Fresh state + sensor snapshot&lt;br&gt;Independent read rate" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf3fb;strokeColor=#648bab;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="40" y="150" width="260" height="90" />
+        <mxCell id="sync" value="&lt;b&gt;Sync&lt;/b&gt;&lt;br&gt;Infer after chunk consumption&lt;br&gt;No cross-chunk fusion" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf3fb;strokeColor=#648bab;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="40" y="300" width="280" height="120" />
         </mxCell>
-        <mxCell id="policy" value="&lt;b&gt;Policy adapter + JointCodec&lt;/b&gt;&lt;br&gt;VLA / VLM / coarse planner&lt;br&gt;Decode into robot-space H × D" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf3fb;strokeColor=#648bab;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="370" y="150" width="310" height="90" />
+        <mxCell id="async" value="&lt;b&gt;Async / choose one method&lt;/b&gt;" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0eafa;strokeColor=#9883b2;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;container=1;pointerEvents=0;verticalAlign=top;spacingTop=18;">
+          <mxGeometry as="geometry" x="480" y="250" width="780" height="300" />
         </mxCell>
-        <mxCell id="schedule" value="&lt;b&gt;Schedule extension point&lt;/b&gt;&lt;br&gt;Async: request-time alignment&lt;br&gt;Sync: rebase after inference" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0eafa;strokeColor=#9883b2;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="750" y="150" width="310" height="90" />
+        <mxCell id="naive" value="&lt;b&gt;Naive&lt;/b&gt;&lt;br&gt;Aligned replacement" parent="async" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9883b2;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="20" y="70" width="230" height="80" />
         </mxCell>
-        <mxCell id="timeline" value="&lt;b&gt;Bounded action timeline&lt;/b&gt;&lt;br&gt;Drop elapsed / stale results&lt;br&gt;Replace · temporal · ensemble" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3d9;strokeColor=#c5a459;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="750" y="340" width="310" height="90" />
+        <mxCell id="temporal" value="&lt;b&gt;Temporal Smoothing&lt;/b&gt;&lt;br&gt;Overlap crossfade" parent="async" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9883b2;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="270" y="70" width="230" height="80" />
         </mxCell>
-        <mxCell id="interpolation" value="&lt;b&gt;Continuous target&lt;/b&gt;&lt;br&gt;Linear / monotone cubic&lt;br&gt;Per-axis blending masks" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f3ee;strokeColor=#69a38a;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="370" y="340" width="310" height="90" />
+        <mxCell id="ensemble" value="&lt;b&gt;Temporal Ensemble&lt;/b&gt;&lt;br&gt;Same-tick EMA" parent="async" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9883b2;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="520" y="70" width="230" height="80" />
         </mxCell>
-        <mxCell id="writer" value="&lt;b&gt;200 Hz command owner&lt;/b&gt;&lt;br&gt;Deadline clock + velocity guard&lt;br&gt;Skip missed slots; never burst" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f3ee;strokeColor=#69a38a;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="40" y="340" width="260" height="90" />
+        <mxCell id="legato" value="&lt;b&gt;Legato&lt;/b&gt;&lt;br&gt;Client protocol scaffold" parent="async" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9883b2;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="20" y="180" width="230" height="80" />
         </mxCell>
-        <mxCell id="adapter" value="&lt;b&gt;RobotAdapter&lt;/b&gt;&lt;br&gt;read · direct write · measured hold&lt;br&gt;No implicit enable / home" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf3fb;strokeColor=#648bab;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="40" y="550" width="310" height="90" />
+        <mxCell id="custom" value="&lt;b&gt;Registered methods&lt;/b&gt;&lt;br&gt;RTC / others: to implement" parent="async" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9883b2;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="270" y="180" width="230" height="80" />
         </mxCell>
-        <mxCell id="spec" value="&lt;b&gt;RobotSpec&lt;/b&gt;&lt;br&gt;Names · units · limits · groups&lt;br&gt;Single / dual / mixed joints" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf3fb;strokeColor=#648bab;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="420" y="550" width="310" height="90" />
+        <mxCell id="timeline" value="&lt;b&gt;Bounded action timeline&lt;/b&gt;&lt;br&gt;Time alignment + method-selected merge" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3d9;strokeColor=#c5a459;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="420" y="620" width="400" height="90" />
         </mxCell>
-        <mxCell id="telemetry" value="&lt;b&gt;Bounded in-memory trace&lt;/b&gt;&lt;br&gt;Latency · jitter · drops · faults&lt;br&gt;JSON / CSV after execution" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f4f5f7;strokeColor=#9aa9b3;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
-          <mxGeometry as="geometry" x="800" y="550" width="310" height="90" />
+        <mxCell id="interpolation" value="&lt;b&gt;Shared interpolation&lt;/b&gt;&lt;br&gt;Linear / monotone cubic&lt;br&gt;Coarse knots → continuous target" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f3ee;strokeColor=#69a38a;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="40" y="800" width="310" height="100" />
         </mxCell>
-        <mxCell id="footer" value="200 Hz is a measured soft-real-time target, not a hard real-time guarantee.&#10;Hardware SDK / safety controller owns bus transport, torque and physical protection." parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;align=left;fontSize=15;">
-          <mxGeometry as="geometry" x="40" y="724" width="1220" height="68" />
+        <mxCell id="writer" value="&lt;b&gt;Shared 200 Hz control&lt;/b&gt;&lt;br&gt;One writer + velocity guard&lt;br&gt;Independent of policy latency" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f3ee;strokeColor=#69a38a;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="450" y="800" width="310" height="100" />
         </mxCell>
-        <mxCell id="obs-policy" source="observation" target="policy" value="snapshot" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=.5;entryX=0;entryY=.5;">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="adapter" value="&lt;b&gt;RobotAdapter + RobotSpec&lt;/b&gt;&lt;br&gt;Arbitrary joint layouts&lt;br&gt;Direct write / measured hold" parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf3fb;strokeColor=#648bab;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;">
+          <mxGeometry as="geometry" x="860" y="800" width="350" height="100" />
         </mxCell>
-        <mxCell id="policy-schedule" source="policy" target="schedule" value="request / result" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=.5;entryX=0;entryY=.5;">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="footer" value="Temporal smoothing is an async method; interpolation is shared execution.&#10;Legato / custom protocols default to no extra fusion. 200 Hz is a soft-real-time target." parent="1" vertex="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;strokeWidth=1.5;fontColor=#193448;fontFamily=Helvetica;fontSize=17;spacing=10;align=left;fontSize=16;">
+          <mxGeometry as="geometry" x="40" y="950" width="1250" height="70" />
         </mxCell>
-        <mxCell id="schedule-timeline" source="schedule" target="timeline" value="timestamped chunk" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=.5;exitY=1;entryX=.5;entryY=0;">
-          <mxGeometry as="geometry" relative="1" />
-        </mxCell>
-        <mxCell id="timeline-interp" source="timeline" target="interpolation" value="aligned knots" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=0;exitY=.5;entryX=1;entryY=.5;">
-          <mxGeometry as="geometry" relative="1" />
-        </mxCell>
-        <mxCell id="interp-writer" source="interpolation" target="writer" value="target" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=0;exitY=.5;entryX=1;entryY=.5;">
-          <mxGeometry as="geometry" relative="1" />
-        </mxCell>
-        <mxCell id="writer-adapter" source="writer" target="adapter" value="one writer" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=.5;exitY=1;entryX=.42;entryY=0;">
-          <mxGeometry as="geometry" relative="1" />
-        </mxCell>
-        <mxCell id="adapter-obs" source="adapter" target="observation" value="" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=0;exitY=.5;entryX=0;entryY=.5;">
+        <mxCell id="mode-sync" source="mode" target="sync" value="sync" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=0;exitY=.5;entryX=.5;entryY=0;">
           <mxGeometry as="geometry" relative="1">
             <Array as="points">
-              <mxPoint x="15" y="595" />
-              <mxPoint x="15" y="195" />
+              <mxPoint x="180" y="155" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="spec-adapter" source="spec" target="adapter" value="joint layout" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=0;exitY=.5;entryX=1;entryY=.5;dashed=1;">
-          <mxGeometry as="geometry" relative="1" />
-        </mxCell>
-        <mxCell id="writer-trace" source="writer" target="telemetry" value="append only" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=.82;exitY=1;entryX=.5;entryY=0;dashed=1;">
+        <mxCell id="mode-async" source="mode" target="async" value="async" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=.5;entryX=.5;entryY=0;">
           <mxGeometry as="geometry" relative="1">
             <Array as="points">
-              <mxPoint x="253" y="478" />
-              <mxPoint x="955" y="478" />
+              <mxPoint x="870" y="155" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="sync-timeline" source="sync" target="timeline" value="replacement" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=.5;exitY=1;entryX=0;entryY=.5;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="180" y="665" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="async-timeline" source="async" target="timeline" value="method-selected fusion" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=.5;exitY=1;entryX=1;entryY=.5;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="870" y="665" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="timeline-interpolation" source="timeline" target="interpolation" value="accepted knots" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=.5;exitY=1;entryX=.5;entryY=0;">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="620" y="750" />
+              <mxPoint x="195" y="750" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="interpolation-writer" source="interpolation" target="writer" value="target" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=.5;entryX=0;entryY=.5;">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="writer-adapter" source="writer" target="adapter" value="commands" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeColor=#59788f;strokeWidth=1.6;fontColor=#36566d;fontSize=13;labelBackgroundColor=#ffffff;exitX=1;exitY=.5;entryX=0;entryY=.5;">
+          <mxGeometry as="geometry" relative="1" />
         </mxCell>
       </root>
     </mxGraphModel>

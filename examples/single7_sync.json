@@ -90,7 +90,6 @@
     "action_hz": 25,
     "control_hz": 200,
     "observation_hz": 50,
-    "smoothing": "temporal",
     "interpolation": "cubic"
   },
   "demo_policy": {

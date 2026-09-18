@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from .inference.async_methods.fusion import ChunkFusion
 from .types import ActionChunk, RobotSpec
 
 
@@ -17,13 +18,14 @@ class Integration:
 
 
 class Timeline:
-    def __init__(self, spec: RobotSpec, method="temporal", capacity=512, new_weight=0.6):
-        if method not in {"replace", "temporal", "ensemble"}:
-            raise ValueError("Unknown smoothing method")
-        if type(capacity) is not int or capacity < 2 or not 0 < new_weight <= 1:
+    def __init__(
+        self, spec: RobotSpec, method="replace", capacity=512, new_weight=0.6, *, fusion=None
+    ):
+        if type(capacity) is not int or capacity < 2:
             raise ValueError("Invalid buffer capacity / ensemble weight")
-        self.spec, self.method, self.capacity = spec, method, capacity
-        self.new_weight = new_weight
+        self.fusion = fusion if fusion is not None else ChunkFusion(method, new_weight)
+        self.spec, self.method, self.capacity = spec, self.fusion.kind, capacity
+        self.new_weight = self.fusion.new_weight
         self.lock = threading.RLock()
         self.generation = 0
         self._latest_id = -1
@@ -61,17 +63,9 @@ class Timeline:
             incoming = {start + i: v.copy() for i, v in enumerate(q[drop:])}
             overlap = sorted(set(incoming) & set(self._points))
             for i, tick in enumerate(overlap):
-                if self.method == "replace":
-                    continue
-                # Explicit newer weight; ensemble is an EMA over same-target-tick predictions.
-                # Temporal endpoint convention follows the validated stream buffer.
-                w = (
-                    self.new_weight
-                    if self.method == "ensemble"
-                    else (i / (len(overlap) - 1) if len(overlap) > 1 else 0.0)
+                incoming[tick] = self.fusion.blend(
+                    self._points[tick], incoming[tick], i, len(overlap), self.spec.blend_mask
                 )
-                mask = self.spec.blend_mask
-                incoming[tick][mask] = (1 - w) * self._points[tick][mask] + w * incoming[tick][mask]
             # New horizon is authoritative; never execute an obsolete trailing tail.
             self._points = {t: p for t, p in self._points.items() if t < start}
             self._points.update(incoming)

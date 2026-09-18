@@ -60,7 +60,6 @@
     "action_hz": 25,
     "control_hz": 200,
     "observation_hz": 50,
-    "smoothing": "temporal",
     "interpolation": "cubic"
   },
   "demo_policy": {
@@ -70,7 +69,7 @@
   "inference": {
     "mode": "async",
     "async": {
-      "method": "basic",
+      "method": "temporal_smoothing",
       "inference_hz": 5
     }
   }

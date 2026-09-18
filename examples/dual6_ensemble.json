@@ -159,8 +159,11 @@
   "inference": {
     "mode": "async",
     "async": {
-      "method": "temporal_smoothing",
-      "inference_hz": 5
+      "method": "temporal_ensemble",
+      "inference_hz": 5,
+      "options": {
+        "new_weight": 0.6
+      }
     }
   }
 }

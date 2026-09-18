@@ -58,6 +58,6 @@ policy = CallablePolicy(
 2. 对适配器做只读检查，确认时间戳新鲜、关节顺序和每路反馈有效；测量 I/O 最坏延迟。
 3. 确认现场授权与停止装置后，单关节小范围、低速度验收；核对命令/反馈方向。
 4. 测量设备侧接收频率、丢帧、跟踪误差、停止保持，再进行单臂与多臂任务。
-5. 比较 replace / temporal / ensemble，分别统计策略延迟、过期 action 和控制 jitter。
+5. 比较 naive / temporal_smoothing / temporal_ensemble，分别统计策略延迟、过期 action 和控制 jitter。
 
 当前整理与测试阶段没有下发任何真机动作。
