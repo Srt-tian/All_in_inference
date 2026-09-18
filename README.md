@@ -20,6 +20,21 @@ Model-agnostic · Embodiment-independent · Sync / Async · NumPy only
 
 ## 解决什么问题
 
+公开入口按下面的层级组织；同步/异步共用底层平滑与高频控制：
+
+```text
+Inference
+├── Sync
+└── Async
+    ├── Basic
+    ├── Legato（客户端协议骨架）
+    └── 注册插件：RTC / 其他方法（需实现）
+         ↓
+共用 Timeline → Smoothing / Interpolation → 200 Hz → RobotAdapter
+```
+
+使用 `inference.create_runtime(...)` 统一构造，见[模式配置与插件注册](docs/ASYNC_METHODS.md#模式入口与插件注册)。旧的底层 `Runtime` 和导入路径保留兼容。
+
 | 层 | 职责 | 当前实现 / 扩展方式 |
 | --- | --- | --- |
 | Policy | 调用模型并解码动作 | `Policy`、`CallablePolicy`、`JointCodec`；接任意 SDK / HTTP / WebSocket 客户端 |
@@ -78,7 +93,10 @@ outputs/dual6/
     "smoothing": "temporal",
     "interpolation": "cubic"
   },
-  "schedule": {"kind": "async", "inference_hz": 5}
+  "inference": {
+    "mode": "async",
+    "async": {"method": "basic", "inference_hz": 5}
+  }
 }
 ```
 
@@ -110,8 +128,9 @@ Legato、RTC 等通过独立的方法层接入，不需要往控制循环添加�
 `RobotSpec` 决定动作布局，没有写死左/右臂索引。支持不同数量的 revolute / prismatic / discrete 轴，通过名称映射模型顺序，通过 group 表达单臂、双臂或升降轴。
 
 ```python
-from all_in_inference import Joint, RobotSpec, Runtime, RuntimeConfig, AsyncSchedule
+from all_in_inference import Joint, RobotSpec, RuntimeConfig
 from all_in_inference.adapters import SimRobot, SinePolicy
+from all_in_inference.inference import create_runtime
 
 spec = RobotSpec("my-7dof", tuple(
     Joint(f"joint_{i}", lower=-2.5, upper=2.5, max_velocity=0.5)
@@ -119,7 +138,8 @@ spec = RobotSpec("my-7dof", tuple(
 ))
 robot = SimRobot(spec, initial=[0] * 7)
 policy = SinePolicy(spec, initial=[0] * 7)
-runtime = Runtime(robot, policy, RuntimeConfig(control_hz=200), AsyncSchedule(5))
+runtime = create_runtime(robot, policy=policy, config=RuntimeConfig(control_hz=200),
+                         inference={"mode": "async", "async": {"method": "basic"}})
 result = runtime.run(duration=5)
 print(result["measured_hz"])
 ```
@@ -135,8 +155,15 @@ src/all_in_inference/
 ├── types.py          # RobotSpec / Observation / Request / ActionChunk / Protocols
 ├── codecs.py         # 模型坐标、单位及 joint order 转换
 ├── adapters.py       # 模拟器、回调硬件接口、策略客户端桥接
-├── scheduling.py     # 同步 / 异步策略，后续调度扩展点
-├── methods.py        # 异步方法生命周期、模型历史、Legato 协议接线
+├── inference/
+│   ├── factory.py     # 先选择 sync / async，再选择异步方法
+│   ├── sync.py        # 同步模式
+│   ├── async_methods/
+│   │   ├── scheduling.py # 异步请求调度
+│   │   └── legato.py     # Legato 协议插件；其他方法可注册
+│   └── contracts.py  # 方法生命周期与模型历史契约
+├── scheduling.py     # 旧导入路径兼容
+├── methods.py        # 旧导入路径兼容
 ├── timeline.py       # 过期丢弃、跨 chunk 融合、连续目标采样
 ├── control.py        # 逐轴速度限制
 ├── runtime.py        # 三个执行角色、故障传播、停止与保持

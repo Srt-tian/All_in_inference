@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 
 from .adapters import SimRobot, SinePolicy
+from .inference import create_runtime
 from .report import export_run
-from .runtime import Runtime, RuntimeConfig, RuntimeFault
-from .scheduling import AsyncSchedule, SyncSchedule
+from .runtime import RuntimeConfig, RuntimeFault
 from .types import Joint, RobotSpec
 
 
@@ -18,20 +18,18 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("outputs/demo"))
     args = parser.parse_args()
     data = json.loads(args.config.read_text(encoding="utf-8"))
-    unknown = set(data) - {"robot", "initial", "runtime", "schedule", "demo_policy"}
+    unknown = set(data) - {"robot", "initial", "runtime", "inference", "demo_policy"}
     if unknown:
         parser.error(f"Unknown config fields: {sorted(unknown)}")
     spec = RobotSpec(data["robot"]["name"], tuple(Joint(**j) for j in data["robot"]["joints"]))
-    schedule_config = dict(data.get("schedule", {}))
-    kind = schedule_config.pop("kind", "async")
-    if kind not in {"sync", "async"}:
-        parser.error("schedule.kind must be sync or async")
-    schedule = AsyncSchedule(**schedule_config) if kind == "async" else SyncSchedule()
-    if kind == "sync" and schedule_config:
-        parser.error("SyncSchedule takes no options")
     robot = SimRobot(spec, data["initial"])
     policy = SinePolicy(spec, data["initial"], **data.get("demo_policy", {}))
-    runtime = Runtime(robot, policy, RuntimeConfig(**data.get("runtime", {})), schedule)
+    runtime = create_runtime(
+        robot,
+        policy=policy,
+        inference=data.get("inference"),
+        config=RuntimeConfig(**data.get("runtime", {})),
+    )
     status = 0
     try:
         runtime.run(args.duration)

@@ -1,6 +1,35 @@
 # 异步方法扩展：Legato、RTC 与其他协议
 
-调度器决定何时请求与如何对齐返回时间；**方法层**决定发什么 payload、如何解码、维护什么模型历史。两者正交，均不拥有机器人写权限。
+## 模式入口与插件注册
+
+```python
+from all_in_inference.inference import create_runtime, register_async_method
+
+# 同步：没有异步方法选项
+runtime = create_runtime(robot, policy=policy, inference={"mode": "sync"})
+
+# 基础异步：普通 Policy
+runtime = create_runtime(robot, policy=policy, inference={
+    "mode": "async", "async": {"method": "basic", "inference_hz": 5},
+})
+
+# Legato：方法插件负责请求构造和解码，transport 负责通信
+runtime = create_runtime(robot, transport=client.infer, inference={
+    "mode": "async", "async": {
+        "method": "legato", "inference_hz": 5,
+        "options": {"chunk_size": 50, "ramp_down": 22},
+    },
+})
+
+# MyRTCMethod 由应用实现，继承 InferenceMethod；不代表内置 RTC 已实现
+register_async_method("my_rtc", MyRTCMethod)
+```
+
+CLI 的示例配置统一改用 `inference.mode` 和 `inference.async`，旧的顶层 `schedule` 配置需迁移。同步模式带 async 配置会报错，未知异步方法也会报错，绝不静默回退。CLI 仍只运行模拟 Basic/Sync；带服务器的方法由 Python API 显式注入 transport。
+
+方法插件可在 options 中接收自定义编解码回调（Python API）；配置文件不能自动导入或执行任意插件代码。需要自定义底层调度器时，仍可显式组合 `Runtime`，但推荐业务入口使用上述模式层级。
+
+公开入口先选择同步 / 异步模式，再在异步模式下选择 Basic、Legato 或注册的方法。内部调度器负责请求时机，方法插件负责协议与历史，均不拥有机器人写权限。
 
 ```text
 Schedule.ready
@@ -12,7 +41,7 @@ Schedule.ready
   → IntegrationFeedback → InferenceMethod.on_integrated
 ```
 
-接口实现位于 `methods.py`：
+接口实现位于 `inference/contracts.py`，异步插件位于 `inference/async_methods/`；旧 `methods.py` 保留导入兼容：
 
 | 接口 | 用途 |
 | --- | --- |

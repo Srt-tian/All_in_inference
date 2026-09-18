@@ -83,12 +83,15 @@
     "smoothing": "temporal",
     "interpolation": "cubic"
   },
-  "schedule": {
-    "kind": "async",
-    "inference_hz": 5
-  },
   "demo_policy": {
     "horizon": 32,
     "latency": 0.02
+  },
+  "inference": {
+    "mode": "async",
+    "async": {
+      "method": "basic",
+      "inference_hz": 5
+    }
   }
 }

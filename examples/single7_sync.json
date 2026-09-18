@@ -93,11 +93,11 @@
     "smoothing": "temporal",
     "interpolation": "cubic"
   },
-  "schedule": {
-    "kind": "sync"
-  },
   "demo_policy": {
     "horizon": 32,
     "latency": 0.02
+  },
+  "inference": {
+    "mode": "sync"
   }
 }
